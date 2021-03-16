@@ -17,9 +17,11 @@ print(output_details)
 
 
     
-img = cv2.imread(r'modelCheck/17.jpg')
+img = cv2.imread(r'modelCheck/12.jpg')
 new_img = cv2.resize(img, (64, 64))
+
 new_img = new_img.astype('float32')
+print(img)
 print(new_img.dtype)
 #input_details[0]['index'] = the index which accepts the input
 interpreter.set_tensor(input_details[0]['index'], [new_img])
