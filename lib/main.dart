@@ -50,7 +50,11 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Image.asset('assets/1.jpeg'),
-            CupertinoButton(child: Text('Press'), onPressed: () {})
+            CupertinoButton(
+                child: Text('Press'),
+                onPressed: () {
+                  modelRec.loadS();
+                })
           ],
         ),
       ),

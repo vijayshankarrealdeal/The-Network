@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/services.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as img;
 
@@ -7,13 +8,12 @@ class ModelRec {
   Future loadModel() async {
     await Tflite.loadModel(
       model: 'assets/gender_model.tflite',
-      labels: 'assets/labels.txt',
     );
   }
 
-  Future rep() async {
+  Future<List> runModel(img.Image image) async {
     var recognitions = await Tflite.runModelOnImage(
-        path: 'assets/1.jpeg', // required
+        path: 'assets/2.jpeg', // required
         imageMean: 0.0, // defaults to 117.0
         imageStd: 255.0, // defaults to 1.0
         numResults: 2, // defaults to 5
@@ -21,6 +21,13 @@ class ModelRec {
         asynch: true // defaults to true
         );
     print(recognitions);
+    // final recognitions = await Tflite.runModelOnBinary(
+    //     binary: imageToByteListFloat32(image, 224, 127.5, 127.5),
+    //     numResults: 2, // defaults to 5
+    //     threshold: 0.05, // defaults to 0.1
+    //     asynch: true);
+    // print(recognitions);
+    // return recognitions;
   }
 
   Uint8List imageToByteListFloat32(
@@ -37,5 +44,20 @@ class ModelRec {
       }
     }
     return convertedBytes.buffer.asUint8List();
+  }
+
+  Future<List> loadS() async {
+    final ByteData bytes = await rootBundle.load('assets/2.jpeg');
+    final Uint8List list = bytes.buffer.asUint8List();
+    print(list);
+    img.Image imImage = img.decodeImage(list);
+
+    img.Image resizedImage = img.copyResize(
+      imImage,
+      width: 64,
+      height: 64,
+    );
+
+    return runModel(resizedImage);
   }
 }
