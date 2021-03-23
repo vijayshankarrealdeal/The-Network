@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
             CupertinoButton(
                 child: Text('Press'),
                 onPressed: () {
-                  modelRec.loadS();
+                  modelRec.runModel();
                 })
           ],
         ),
