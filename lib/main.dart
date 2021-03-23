@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hex/MLModel/tf.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:tflite/tflite.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,19 +12,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
       home: MyHomePage(),
     );
   }
@@ -34,11 +23,49 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  ModelRec modelRec = ModelRec();
+  File file;
+  final picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
-    modelRec.loadModel();
+    loadModel();
+  }
+
+  // ignore: missing_return
+  Future<List> runModel(File file) async {
+    try {
+      var recognitions = await Tflite.runModelOnImage(
+          path: file.path,
+          imageMean: 0.0, // defaults to 117.0
+          imageStd: 255.0, // defaults to 1.0
+          numResults: 2, // defaults to 5
+          threshold: 0.2, // defaults to 0.1
+          asynch: true);
+
+      print(recognitions);
+      return recognitions;
+    } catch (e) {
+      print(e.message);
+    }
+  }
+
+  Future loadModel() async {
+    await Tflite.loadModel(
+      model: 'assets/gender_model.tflite',
+      labels: 'assets/labels.txt',
+    );
+  }
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        file = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
   }
 
   @override
@@ -49,11 +76,13 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset('assets/1.jpeg'),
+            file == null ? Text('') : Image.file(file),
+            CupertinoButton(
+                child: Text('Select Image'), onPressed: () => getImage()),
             CupertinoButton(
                 child: Text('Press'),
                 onPressed: () {
-                  modelRec.runModel();
+                  runModel(file);
                 })
           ],
         ),

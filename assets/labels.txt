@@ -1,2 +1,2 @@
-0 Female
-1 Male
+Female
+Male
