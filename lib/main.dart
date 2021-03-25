@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hex/MLModel/tf.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tflite/tflite.dart';
+import 'package:image/image.dart' as im;
 
 void main() {
   runApp(MyApp());
@@ -23,38 +25,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  ModelT g = ModelT();
   File file;
-  final picker = ImagePicker();
 
+  final picker = ImagePicker();
   @override
   void initState() {
+    g.loadModel();
     super.initState();
-    loadModel();
-  }
-
-  // ignore: missing_return
-  Future<List> runModel(File file) async {
-    try {
-      var recognitions = await Tflite.runModelOnImage(
-          path: file.path,
-          imageMean: 0.0, // defaults to 117.0
-          imageStd: 255.0, // defaults to 1.0
-          numResults: 2, // defaults to 5
-          threshold: 0.2, // defaults to 0.1
-          asynch: true);
-
-      print(recognitions);
-      return recognitions;
-    } catch (e) {
-      print(e.message);
-    }
-  }
-
-  Future loadModel() async {
-    await Tflite.loadModel(
-      model: 'assets/gender_model.tflite',
-      labels: 'assets/labels.txt',
-    );
   }
 
   Future getImage() async {
@@ -81,8 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text('Select Image'), onPressed: () => getImage()),
             CupertinoButton(
                 child: Text('Press'),
-                onPressed: () {
-                  runModel(file);
+                onPressed: () async {
+                  g.predictImage(file.path);
                 })
           ],
         ),
