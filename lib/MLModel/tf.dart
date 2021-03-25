@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:html';
-import 'dart:typed_data';
 import 'package:flutter/services.dart';
-import 'package:image/image.dart' as im;
 import 'package:tflite/tflite.dart';
 
 const int kModelInputSize = 64;
