@@ -58,7 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
             CupertinoButton(
                 child: Text('Press'),
                 onPressed: () async {
-                  g.canvasPt(file);
+                  final res = await g.getPred(file);
+                  print(res);
                 })
           ],
         ),
